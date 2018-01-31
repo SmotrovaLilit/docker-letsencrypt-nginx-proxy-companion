@@ -14,12 +14,12 @@ function check_nginx_proxy_container_run {
         return 0
     fi
 
-    echo "$(date), Error: nginx-proxy container ${_nginx_proxy_container}  isn't run" >&2
+    echo "$(date "+%Y/%m/%d %T"), Error: nginx-proxy container ${_nginx_proxy_container}  isn't running" >&2
     return 1
 }
 
 function check_two_containers_case() {
-    local _docker_gen_container = $(docker_gen_container)
+    local _docker_gen_container=$(docker_gen_container)
     if [[ -n "${_docker_gen_container:-}" ]]; then  #case with 3 containers
         return 1
     fi
@@ -81,7 +81,7 @@ function docker_exec {
     if [[ -n $exec_id && ($exec_id != "null") ]]; then
         docker_api /exec/$exec_id/start "POST" '{"Detach": false, "Tty":false}'
     else
-        echo "$(date), Error: can't exec command ${cmd} in container ${id}. Check container is run" >&2
+        echo "$(date "+%Y/%m/%d %T"), Error: can't exec command ${cmd} in container ${id}. Check if the container is running" >&2
         return 1
     fi
 }
@@ -124,7 +124,7 @@ reload_nginx() {
             echo "Reloading nginx proxy (${_nginx_proxy_container})..."
             docker_exec "${_nginx_proxy_container}" \
                         '[ "sh", "-c", "/usr/local/bin/docker-gen /app/nginx.tmpl /etc/nginx/conf.d/default.conf; /usr/sbin/nginx -s reload" ]'
-            [[ $? -eq 1 ]] && echo "$(date), Error: can't reload nginx-proxy. Check container is run" >&2
+            [[ $? -eq 1 ]] && echo "$(date "+%Y/%m/%d %T"), Error: can't reload nginx-proxy. Check if the container is running" >&2
         fi
     fi
 }
